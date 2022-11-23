@@ -22,4 +22,19 @@ export class AttachmentUtils {
         const attachmentUrl = `https://${this.bucketName}.s3.amazonaws.com/${attachmentId}`
         return attachmentUrl
     }
+
+    async getAttachmentSignedUrl(attachmentId: string): Promise<string> {
+        return this.s3.getSignedUrl('getObject', {
+            Bucket: this.bucketName,
+            Key: attachmentId,
+            Expires: parseInt(this.urlExpiration)
+        })
+    }
+
+    async deleteAttachment(attachmentId: string) {
+        this.s3.deleteObject({
+            Bucket: this.bucketName,
+            Key: attachmentId
+        }).promise()
+    }
 }
