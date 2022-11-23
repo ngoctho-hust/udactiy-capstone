@@ -63,6 +63,20 @@ export class TodosAccess {
         return todoUpdate
     }
 
+    async getTodo(userId: string, todoId: string): Promise<TodoItem> {
+        logger.info('start get todo');
+
+        const result = await this.docClient.get({
+            TableName: this.todosTable,
+            Key: {
+                userId: userId,
+                todoId: todoId
+            }
+        }).promise()
+        logger.info('get todo result: ' + result);
+        return result.Item as TodoItem
+    }
+
     async updateAttachmentUrl(userId: string, todoId: string, uploadUrl: string): Promise<string> {
         logger.info('start update attachment url: ' + uploadUrl);
 

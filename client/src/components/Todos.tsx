@@ -2,6 +2,7 @@ import dateFormat from 'dateformat'
 import { History } from 'history'
 import update from 'immutability-helper'
 import * as React from 'react'
+import { saveAs } from 'file-saver'
 import {
   Button,
   Checkbox,
@@ -14,7 +15,7 @@ import {
   Loader
 } from 'semantic-ui-react'
 
-import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
+import { createTodo, deleteTodo, getTodos, patchTodo, getSignedUrl, deleteAttachment } from '../api/todos-api'
 import Auth from '../auth/Auth'
 import { Todo } from '../types/Todo'
 
@@ -68,6 +69,31 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       })
     } catch {
       alert('Todo deletion failed')
+    }
+  }
+
+  onAttachmentDelete = async (pos: number) => {
+    try {
+      const todo = this.state.todos[pos]
+      await deleteAttachment(this.props.auth.getIdToken(), todo.todoId)
+      this.setState({
+        todos: update(this.state.todos, {
+          [pos]: { attachmentUrl: { $set: '' } }
+        })
+      })
+      alert('Attachment is deleted')
+    } catch {
+      alert('Attachment deletion failed')
+    }
+  }
+
+  onAttachmentDownload = async (pos: number) => {
+    try {
+      const todo = this.state.todos[pos]
+      const signedUrl = await getSignedUrl(this.props.auth.getIdToken(), todo.todoId)
+      saveAs(signedUrl)
+    } catch {
+      alert('Download attachment failed')
     }
   }
 
@@ -193,7 +219,17 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                 </Button>
               </Grid.Column>
               {todo.attachmentUrl && (
-                <Image src={todo.attachmentUrl} size="small" wrapped />
+                <Grid.Row width={16} verticalAlign="middle">
+                  <Image src={todo.attachmentUrl} size="small" wrapped onClick={() => this.onAttachmentDownload(pos)} />
+                  <Button
+                    icon
+                    color="red"
+                    onClick={() => this.onAttachmentDelete(pos)}
+                    floated='right'
+                  >
+                    <Icon name="trash alternate outline" />
+                  </Button>
+                </Grid.Row>
               )}
               <Grid.Column width={16}>
                 <Divider />

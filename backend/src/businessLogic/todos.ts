@@ -39,6 +39,12 @@ export async function updateTodo(userId: string, todoId: string, updatedTodo: Up
     return todosAccess.updateTodo(userId, todoId, todoUpdate)
 }
 
+
+export async function getTodo(userId: string, todoId: string): Promise<TodoItem> {
+    logger.info('get todo: ' + userId + "," + todoId);
+    return todosAccess.getTodo(userId, todoId)
+}
+
 export async function updateAttachmentUrl(userId: string, todoId: string, attachmentUrl: string): Promise<string> {
     logger.info('update attachment url: ' + userId + "," + todoId + "," + attachmentUrl);
     return todosAccess.updateAttachmentUrl(userId, todoId, attachmentUrl)

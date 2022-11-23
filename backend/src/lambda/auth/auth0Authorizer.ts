@@ -3,14 +3,10 @@ import 'source-map-support/register'
 
 import { verify } from 'jsonwebtoken'
 import { createLogger } from '../../utils/logger'
-// import Axios from 'axios'
 import { JwtPayload } from '../../auth/JwtPayload'
 
 const logger = createLogger('auth')
 
-// to verify JWT token signature.
-// To get this URL you need to go to an Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
-// const jwksUrl = 'https://dev-80m6nhe4ez64ltsx.us.auth0.com/.well-known/jwks.json'
 const cert = `-----BEGIN CERTIFICATE-----
 MIIDHTCCAgWgAwIBAgIJIgj93a5A9fU1MA0GCSqGSIb3DQEBCwUAMCwxKjAoBgNV
 BAMTIWRldi04MG02bmhlNGV6NjRsdHN4LnVzLmF1dGgwLmNvbTAeFw0yMjExMTkw
@@ -73,13 +69,6 @@ export const handler = async (
 
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const token = getToken(authHeader)
-  // const jwt: Jwt = decode(token, { complete: true }) as Jwt
-  // const cerRes = await Axios.get(jwksUrl)
-
-  // You should implement it similarly to how it was implemented for the exercise for the lesson 5
-  // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-  // const cerData = cerRes['data']['key'][0]['x5c'][0]
-  // const cert = `-----BEGIN CERTIFICATE-----\n${cerData}\n-----END CERTIFICATE-----`
 
   return  verify(token, cert, { algorithms: ['RS256'] }) as JwtPayload
 }

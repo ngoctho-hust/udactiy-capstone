@@ -68,6 +68,31 @@ export async function getUploadUrl(
   return response.data.uploadUrl
 }
 
+export async function getSignedUrl(
+  idToken: string,
+  todoId: string
+): Promise<string> {
+  const response = await Axios.get(`${apiEndpoint}/todos/${todoId}/attachment`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
+    }
+  })
+  return response.data.signedUrl
+}
+
+export async function deleteAttachment(
+  idToken: string,
+  todoId: string
+): Promise<void> {
+  await Axios.delete(`${apiEndpoint}/todos/${todoId}/attachment`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
+    }
+  })
+}
+
 export async function uploadFile(uploadUrl: string, file: Buffer): Promise<void> {
   await Axios.put(uploadUrl, file)
 }

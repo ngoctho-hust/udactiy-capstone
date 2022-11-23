@@ -3,10 +3,10 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
-
-import { deleteTodo, getTodo } from '../../businessLogic/todos'
-import { getUserId } from '../utils'
 import { AttachmentUtils } from '../../helpers/attachmentUtils'
+
+import { getTodo, updateAttachmentUrl } from '../../businessLogic/todos'
+import { getUserId } from '../utils'
 
 const attachmentUtils = new AttachmentUtils()
 
@@ -15,17 +15,11 @@ export const handler = middy(
     const todoId = event.pathParameters.todoId
     const userId = getUserId(event)
 
-    const todoItem = await getTodo(userId, todoId)
-    if (!todoItem) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({})
-      }
-    }
+    let todoItem = await getTodo(userId, todoId)
 
     await attachmentUtils.deleteAttachment(todoItem.attachmentUrl.split('/').pop())
-    await deleteTodo(userId, todoId)
-    
+    await updateAttachmentUrl(userId, todoId, '')
+
     return {
       statusCode: 201,
       body: JSON.stringify({})
@@ -39,4 +33,4 @@ handler
     cors({
       credentials: true
     })
- )
+  )
